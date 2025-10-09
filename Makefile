@@ -11,30 +11,6 @@
 #                                                                              #
 # **************************************************************************** #
 
-# Variables
-CC = gcc
-FLAGS = -Wall -Wextra -Werror
-RM = rm -f
-SRCS = src/pipex.c
-OBJS_ = $(SRCS:.c=.o)
-
-# Regla de compilación
-all: $(NAME)	
-# Compilación del servidor y cliente
-$(SERVER): $(OBJS_SERVER) minitalk.h
-	$(CC) $(FLAGS) -o $(SERVER) $(OBJS_SERVER)
-$(CLIENT): $(OBJS_CLIENT) minitalk.h
-	$(CC) $(FLAGS) -o $(CLIENT) $(OBJS_CLIENT)
-# Limpieza de archivos objeto y ejecutables
-clean:
-	$(RM) $(NAME)
-# Limpieza completa
-fclean: clean
-	$(RM) $(NAME)
-re: fclean all
-# Prevención de conflictos con archivos y directorios
-.PHONY: all clean fclean re
-=======
 # Ejecutables
 NAME = pipex
 NAME_BONUS = pipex_bonus
@@ -42,7 +18,7 @@ NAME_BONUS = pipex_bonus
 # Compilador y flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -I$(INCDIR)
-RM = rm -f
+RM = rm -fCC = gcc
 
 # Directorios
 SRCDIR = src
@@ -66,16 +42,17 @@ $(NAME_BONUS): $(OBJ_BONUS)
 	$(CC) $(CFLAGS) -o $@ $^
 $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
+	
+# Creación del directorio objeto
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-# Reglas de limpieza
+# Limpieza de archivos objeto y ejecutables
 clean:
-	rm -rf $(OBJDIR)
+	$(RM) $(NAME)
+# Limpieza completa
 fclean: clean
-	rm -f $(NAME) $(NAME_BONUS)
+	$(RM) $(NAME)
 re: fclean all
-	
-# Objetivos que no son archivos
+# Prevención de conflictos con archivos y directorios
 .PHONY: all clean fclean re bonus
-

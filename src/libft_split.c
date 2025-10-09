@@ -1,63 +1,81 @@
 #include "pipex.h"
 
-static int count_words(const char *s, char c)
+// Cuenta cuántas "substrings" hay según el delimitador.
+size_t	count_substr(const char *s, char c)
 {
-    int count = 0;
-    int in_word = 0;
-
-    while (*s)
-    {
-        if (*s != c && !in_word)
-        {
-            in_word = 1;
-            count++;
-        }
-        else if (*s == c)
-            in_word = 0;
-        s++;
-    }
-    return (count);
+	size_t	count = 0;
+	while (*s)
+	{
+		while (*s == c)
+			s++;
+		if (*s)
+		{
+			count++;
+			while (*s && *s != c)
+				s++;
+		}
+	}
+	return (count);
 }
 
-static char *word_dup(const char *s, int start, int end)
+// Libera la memoria del array parcial en caso de fallo de malloc.
+void	free_split(char **array, size_t idx)
 {
-    int len = end - start;
-    char *word = malloc(len + 1);
-    int i = 0;
-
-    if (!word)
-        return (NULL);
-    while (start < end)
-    {
-        word[i++] = s[start++];
-    }
-    word[i] = '\0';
-    return (word);
+	while (idx > 0)
+		free(array[--idx]);
+	free(array);
 }
 
-char **ft_split(const char *str, char car)
+// Copia la substring con ayuda de ft_substr (de libft).
+char	*copy_substr(const char *start, char c)
 {
-    char    **result;
-    int     i = 0;
-    int     j = 0;
-    int     start = -1;
+	size_t	len = 0;
+	while (start[len] && start[len] != c)
+		len++;
+	return (ft_substr(start, 0, len)); // Usando libft para modularidad.
+}
 
-    if (!str)
-        return (NULL);
-    result = malloc((count_words(str, car) + 1) * sizeof(char *));
-    if (!result)
-        return (NULL);
-    while (str[i])
-    {
-        if (str[i] != car && start < 0)
-            start = i;
-        else if ((str[i] == car || str[i + 1] == '\0') && start >= 0)
-        {
-            result[j++] = word_dup(str, start, i + (str[i] != car));
-            start = -1;
-        }
-        i++;
-    }
-    result[j] = NULL;
-    return (result);
+// Llena el array principal llamando a la copia por substring.
+int	fill_array(char **array, const char *s, char c, size_t count)
+{
+	size_t	i = 0;
+	while (*s && i < count)
+	{
+		while (*s == c)
+			s++;
+		if (*s)
+		{
+			array[i] = copy_substr(s, c);
+			if (!array[i])
+			{
+				free_split(array, i);
+				return (0);
+			}
+			i++;
+			while (*s && *s != c)
+				s++;
+		}
+	}
+	array[i] = NULL;
+	return (1);
+}
+
+// La función principal ft_split con delegación clara.
+char	**ft_split(char const *s, char c)
+{
+	char		**array;
+	size_t		count;
+
+	if (!s)
+		return (NULL);
+	count = count_substr(s, c);
+	array = (char **)malloc(sizeof(char *) * (count + 1));
+	if (!array)
+		return (NULL);
+	if (!fill_array(array, s, c, count))
+	{
+		free(array);
+		return (NULL);
+	}
+	return (array);
 }

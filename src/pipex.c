@@ -10,81 +10,75 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-include "pipex.h" 	
+#include "pipex.h"
 
-void execute_cmd(char *argv, char **envp)
+void process_child(char *argv[], char *envp[], int pipefd[], int infile)
 {
-    char **cmd; 
-    char *path; 
+    char **cmd_args;
+    char *cmd_path;
 
-    cmd = NULL; 
-    path = NULL;
-    cmd = ft_split(argv, ' '); //Divide la cadena argv en un array de cadenas usando espacio como delimitador
-    if (!cmd) //Si no se pudo asignar memoria para cmd
-        exit_error("Error: Memory allocation failed\n"); //manejo de error
-    path = get_path(cmd[0], envp); //Obtiene la ruta del comando
-    if (!path) //Si no se encuentra la ruta del comando
-    {
-        free_matrix(cmd);
-        exit_error("Error: Command not found\n");
-    }
-    if (execve(path, cmd, envp) == -1)
-    {
-        free(path);
-        free_matrix(cmd);
-        exit_error("Error: execve failed\n");
-    }
+    if (dup2(infile, STDIN_FILENO) < 0)
+        ft_error("dup2 failed");
+    if (dup2(pipefd[1], STDOUT_FILENO) < 0)
+        ft_error("dup2 failed");
+    close(pipefd[0]);
+    close(infile);
+    cmd_args = ft_split(argv[2], ' ');
+    if (!cmd_args)
+        ft_error("malloc failed");
+    cmd_path = get_cmd_path(cmd_args[0], envp);
+    if (!cmd_path)
+        ft_error_cmd(cmd_args[0]);
+    execve(cmd_path, cmd_args, envp);
+    ft_error("execve failed");
 }
 
-char *get_path(char *cmd, char **envp)
+void process_parent(char *argv[], char *envp[], int pipefd[], int outfile)
 {
-    char **paths;
-    char *full_path;
-    int i;
+    char **cmd_args;
+    char *cmd_path;
 
-    i = 0;
-    while (envp[i] && strncmp(envp[i], "PATH=", 5) != 0)
-        i++;
-    if (!envp[i])
-        return NULL;
-    paths = ft_split(envp[i] + 5, ':');
-    if (!paths)
-        exit_error("Error: Memory allocation failed\n");
-    i = 0;
-    while (paths[i])
-    {
-        full_path = malloc(strlen(paths[i]) + strlen(cmd) + 2);
-        if (!full_path)
-        {
-            free_matrix(paths);
-            exit_error("Error: Memory allocation failed\n");
-        }
-        strcpy(full_path, paths[i]);
-        strcat(full_path, "/");
-        strcat(full_path, cmd);
-        if (access(full_path, X_OK) == 0)
-        {
-            free_matrix(paths);
-            return full_path;
-        }
-        free(full_path);
-        i++;
-    }
-    free_matrix(paths);
-    return NULL;
+    if (dup2(pipefd[0], STDIN_FILENO) < 0)
+        ft_error("dup2 failed");
+    if (dup2(outfile, STDOUT_FILENO) < 0)
+        ft_error("dup2 failed");
+    close(pipefd[1]);
+    close(outfile);
+    cmd_args = ft_split(argv[3], ' ');
+    if (!cmd_args)
+        ft_error("malloc failed");
+    cmd_path = get_cmd_path(cmd_args[0], envp);
+    if (!cmd_path)
+        ft_error_cmd(cmd_args[0]);
+    execve(cmd_path, cmd_args, envp);
+    ft_error("execve failed");
 }
 
-void free_matrix(char **matrix)
+int main(int argc, char *argv[], char *envp[])
 {
-    int i;
+    int infile;
+    int outfile;
+    int pipefd[2];
+    pid_t pid;
 
-    if (!matrix)
-        return;
-    i = 0;
-    while (matrix[i])
+    ft_error_argc(argc);
+    infile = open(argv[1], O_RDONLY);
+    if (infile < 0)
+        ft_error_file(argv[1]);
+    outfile = open(argv[4], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    if (outfile < 0)
     {
-        free(matrix[i]);
-        i++;
+        close(infile);
+        ft_error_file(argv[4]);
     }
-    free(matrix);
+    if (pipe(pipefd) < 0)
+        ft_error("Pipe creation failed");
+    pid = fork();
+    if (pid < 0)
+        ft_error("Fork failed");
+    if (pid == 0)
+        process_child(argv, envp, pipefd, infile);
+    wait(NULL);
+    process_parent(argv, envp, pipefd, outfile);
+    return (0);
 }
