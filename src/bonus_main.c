@@ -1,4 +1,5 @@
 #include "pipex.h"
+#include "pipex_bonus.h"
 
 // Valida argumentos de entrada
 static void check_args(int argc)
