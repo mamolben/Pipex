@@ -1,9 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   libft_split.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/18 19:53:26 by marimoli          #+#    #+#             */
+/*   Updated: 2025/10/18 20:25:14 by marimoli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
-// Cuenta cuántas "substrings" hay según el delimitador.
 size_t	count_substr(const char *s, char c)
 {
-	size_t	count = 0;
+	size_t	count;
+
+	count = 0;
 	while (*s)
 	{
 		while (*s == c)
@@ -18,7 +31,6 @@ size_t	count_substr(const char *s, char c)
 	return (count);
 }
 
-// Libera la memoria del array parcial en caso de fallo de malloc.
 void	free_split(char **array, size_t idx)
 {
 	while (idx > 0)
@@ -26,23 +38,25 @@ void	free_split(char **array, size_t idx)
 	free(array);
 }
 
-// Copia la substring con ayuda de ft_substr (de libft).
 char	*copy_substr(const char *start, char c)
 {
-	size_t	len = 0;
+	size_t	len;
+
+	len = 0;
 	while (start[len] && start[len] != c)
 		len++;
-	return (ft_substr(start, 0, len)); // Usando libft para modularidad.
+	return (ft_substr(start, 0, len));
 }
 
-// Llena el array principal llamando a la copia por substring.
 int	fill_array(char **array, const char *s, char c, size_t count)
 {
-	size_t	i = 0;
+	size_t	i;
+
+	i = 0;
 	while (*s && i < count)
 	{
 		while (*s == c)
-			s++;
+		s++;
 		if (*s)
 		{
 			array[i] = copy_substr(s, c);
@@ -60,11 +74,10 @@ int	fill_array(char **array, const char *s, char c, size_t count)
 	return (1);
 }
 
-// La función principal ft_split con delegación clara.
 char	**ft_split(char const *s, char c)
 {
-	char		**array;
-	size_t		count;
+	char	**array;
+	size_t	count;
 
 	if (!s)
 		return (NULL);
