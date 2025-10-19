@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 19:47:25 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/18 20:13:42 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/10/19 18:41:24 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,17 @@ char	*find_path_env(char *envp[])
 	i = 0;
 	while (envp[i] && ft_strncmp(envp[i], "PATH=", 5))
 		i++;
-	return (envp[i] ? envp[i] + 5 : NULL);
+	if (envp[i])
+		return (envp[i] + 5);
+	else
+		return (NULL);
 }
 
 static char	*find_executable(char **paths, char *cmd)
 {
 	char	*candidate;
-	int	i;
- 
+	int		i;
+
 	i = 0;
 	while (paths[i])
 	{
@@ -55,13 +58,13 @@ static char	*find_executable(char **paths, char *cmd)
 char	*get_cmd_path(char *cmd, char *envp[])
 {
 	char	*path_str;
-	char	**paths; 
-	char	*result; 
+	char	**paths;
+	char	*result;
 
 	path_str = find_path_env(envp);
 	paths = ft_split(path_str, ':');
 	result = NULL;
-	if (!cmd || !paths) 
+	if (!cmd || !paths)
 		return (NULL);
 	result = find_executable(paths, cmd);
 	ft_free(paths);

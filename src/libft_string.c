@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 19:47:48 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/18 20:21:41 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/10/19 12:48:47 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 size_t	ft_strlen(const char *str)
 {
 	size_t	len;
-	
+
 	len = 0;
 	while (str && str[len])
 		len++;
@@ -49,17 +49,17 @@ char	*ft_substr(char const *str, unsigned int start, size_t len)
 
 	if (!str)
 		return (NULL);
-	if (start >= ft_strlen(str)) 
+	if (start >= ft_strlen(str))
 		return (ft_strdup(""));
 	if (len > ft_strlen(str + start))
 		len = ft_strlen(str + start);
-		substr = malloc(len + 1);
+	substr = malloc(len + 1);
 	if (!substr)
 		return (NULL);
 	pos = 0;
-	while (pos < len) 
+	while (pos < len)
 	{
-		substr[pos] = str[start + pos]; 
+		substr[pos] = str[start + pos];
 		pos++;
 	}
 	substr[pos] = '\0';

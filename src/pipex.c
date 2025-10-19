@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 16:01:28 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/18 19:42:32 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/10/19 18:28:43 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 void	process_child(char *argv[], char *envp[], int pipefd[], int infile)
 {
-	char **cmd_args;
-	char *cmd_path;
+	char	**cmd_args;
+	char	*cmd_path;
 
 	if (dup2(infile, STDIN_FILENO) < 0)
 		ft_error("dup2 failed");
@@ -35,8 +35,8 @@ void	process_child(char *argv[], char *envp[], int pipefd[], int infile)
 
 void	process_parent(char *argv[], char *envp[], int pipefd[], int outfile)
 {
-	char **cmd_args;
-	char *cmd_path;
+	char	**cmd_args;
+	char	*cmd_path;
 
 	if (dup2(pipefd[0], STDIN_FILENO) < 0)
 		ft_error("dup2 failed");
@@ -56,9 +56,9 @@ void	process_parent(char *argv[], char *envp[], int pipefd[], int outfile)
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	int	infile;
-	int	outfile;
-	int	pipefd[2];
+	int		infile;
+	int		outfile;
+	int		pipefd[2];
 	pid_t	pid;
 
 	ft_error_argc(argc);

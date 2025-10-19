@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 16:02:34 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/18 20:53:48 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/10/19 12:57:34 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,12 @@ char	*ft_strjoin(char const *s1, char const *s2);
 size_t	count_substr(const char *s, char c);
 void	free_split(char **array, size_t idx);
 char	*copy_substr(const char *start, char c);
-int	fill_array(char **array, const char *s, char c, size_t count);
+int		fill_array(char **array, const char *s, char c, size_t count);
 char	**ft_split(const char *str, char car);
 
 /*libft_mem_dup.c*/
 void	ft_free(char **str);
-int	ft_strncmp(const char *str1, const char *str2, size_t n);
+int		ft_strncmp(const char *str1, const char *str2, size_t n);
 
 /* error.c */
 void	ft_error(const char *msg);

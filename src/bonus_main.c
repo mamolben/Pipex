@@ -6,23 +6,41 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 20:28:34 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/18 21:09:13 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/10/19 18:23:04 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include "pipex_bonus.h"
 
-static void	check_args(int argc)
+void	check_args(t_pipex *px)
 {
-	if (argc < 5)
+	if (px->argc < 5)
 	{
-		write(2, "Usage: ./pipex_bonus infile cmd1 ... cmdN outfile\n", 51);
+		write(2, "Usage: ./pipex_bonus [here_doc LIMITER] cmd1 ... cmdN outfile\n", 63);
 		exit(EXIT_FAILURE);
 	}
+	px->is_heredoc = (ft_strcmp(px->argv[1], "here_doc") == 0);
 }
 
-static int	**init_pipes(int cmd_count)
+
+void	init_files(t_pipex *px)
+{
+	if (px->is_heredoc)
+	{
+		px->infile = create_heredoc_file(px->argv[2]);
+		px->outfile = open(px->argv[px->argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+	}
+	else
+	{
+		px->infile = open_file_in(px->argv[1]);
+		px->outfile = open_file_out(px->argv[px->argc - 1]);
+	}
+	if (px->infile < 0 || px->outfile < 0)
+		exit(EXIT_FAILURE);
+}
+
+int	**init_pipes(int cmd_count)
 {
 	int	**pipes;
 	int	i;
@@ -37,7 +55,7 @@ static int	**init_pipes(int cmd_count)
 		if (!pipes[i])
 			ft_error("malloc failed");
 		if (pipe(pipes[i]) == -1)
-			ft_error("Pipe creation failed");
+			ft_error("pipe failed");
 		i++;
 	}
 	return (pipes);
@@ -46,7 +64,7 @@ static int	**init_pipes(int cmd_count)
 static void	free_pipes(int **pipes, int cmd_count)
 {
 	int	i;
-	
+
 	i = 0;
 	while (i < cmd_count - 1)
 	{
@@ -58,15 +76,16 @@ static void	free_pipes(int **pipes, int cmd_count)
 	free(pipes);
 }
 
-static void spawn_children(int cmd_count, char *argv[], char *envp[],
-	int **pipes, int infile, int outfile)
+/*static void	spawn_children(int cmd_count, char *argv[], char *envp[],
+			int **pipes, int infile, int outfile)
 {
-	int	i;
-    
+	int		i;
+	pid_t	pid;
+
 	i = 0;
 	while (i < cmd_count - 1)
 	{
-		pid_t pid = fork();
+		pid = fork();
 		if (pid < 0)
 			ft_error("Fork failed");
 		if (pid == 0)
@@ -77,27 +96,52 @@ static void spawn_children(int cmd_count, char *argv[], char *envp[],
 				execute_last_child(argv[argc - 2], envp, pipes[i - 1], outfile);
 			else
 				execute_middle_child(argv[i + 2], envp, pipes[i - 1], pipes[i]);
-        }
+		}
+		i++;
+	}
+}*/
+void	spawn_children(t_pipex *px)
+{
+	int		i;
+	pid_t	pid;
+
+	i = 0;
+	while (i < px->cmd_count)
+	{
+		pid = fork();
+		if (pid < 0)
+			ft_error("fork failed");
+		if (pid == 0)
+			child_process(px, i);
 		i++;
 	}
 }
 
+void	child_process(t_pipex *px, int i)
+{
+	if (i == 0)
+		execute_first_child(px, i);
+	else if (i == px->cmd_count - 1)
+		execute_last_child(px, i);
+	else
+		execute_middle_child(px, i);
+}
+
 int	main(int argc, char *argv[], char *envp[])
 {
-	int	cmd_count;
-	int	infile;
-	int	outfile;
-	int	**pipes;
+	t_pipex	px;
 
-	check_args(argc);
-	cmd_count = argc - 3;
-	infile = open_file_in(argv[1], argc);
-	outfile = open_file_out(argv[argc - 1], argc);
-	pipes = init_pipes(cmd_count);
-	spawn_children(cmd_count, argv, envp, pipes, infile, outfile);
-	free_pipes(pipes, cmd_count);
-	close(infile);
-	close(outfile);
-	wait_for_all(cmd_count);
+	px.argc = argc;
+	px.argv = argv;
+	px.envp = envp;
+	check_args(&px);
+	init_files(&px);
+	px.cmd_count = px.argc - 3 - px.is_heredoc;
+	px.pipes = init_pipes(px.cmd_count);
+	spawn_children(&px);
+	free_pipes(px.pipes, px.cmd_count);
+	close(px.infile);
+	close(px.outfile);
+	wait_for_all(px.cmd_count);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 19:53:26 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/18 20:25:14 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/10/19 12:44:53 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	fill_array(char **array, const char *s, char c, size_t count)
 	while (*s && i < count)
 	{
 		while (*s == c)
-		s++;
+			s++;
 		if (*s)
 		{
 			array[i] = copy_substr(s, c);
