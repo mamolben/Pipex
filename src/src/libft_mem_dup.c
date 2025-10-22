@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 20:01:25 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/20 20:17:40 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/10/19 18:43:23 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,4 +39,17 @@ int	ft_strncmp(const char *str1, const char *str2, size_t n)
 		pos++;
 	}
 	return (0);
+}
+
+void	close_all_pipes(int **pipes, int cmd_count)
+{
+	int	i;
+
+	i = 0;
+	while (i < cmd_count - 1)
+	{
+		close(pipes[i][0]);
+		close(pipes[i][1]);
+		i++;
+	}
 }

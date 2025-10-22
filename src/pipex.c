@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 16:01:28 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/02 16:02:12 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/10/20 19:55:36 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,31 +54,35 @@ void process_parent(char *argv[], char *envp[], int pipefd[], int outfile)
     ft_error("execve failed");
 }
 
-int main(int argc, char *argv[], char *envp[])
+static void	init_fds(char *argv[], int *infile, int *outfile)
 {
-    int infile;
-    int outfile;
-    int pipefd[2];
-    pid_t pid;
-
-    ft_error_argc(argc);
-    infile = open(argv[1], O_RDONLY);
-    if (infile < 0)
-        ft_error_file(argv[1]);
-    outfile = open(argv[4], O_CREAT | O_WRONLY | O_TRUNC, 0644);
-    if (outfile < 0)
-    {
-        close(infile);
-        ft_error_file(argv[4]);
-    }
-    if (pipe(pipefd) < 0)
-        ft_error("Pipe creation failed");
-    pid = fork();
-    if (pid < 0)
-        ft_error("Fork failed");
-    if (pid == 0)
-        process_child(argv, envp, pipefd, infile);
-    wait(NULL);
-    process_parent(argv, envp, pipefd, outfile);
-    return (0);
+	*infile = open(argv[1], O_RDONLY);
+	if (*infile < 0)
+		ft_error_file(argv[1]);
+	*outfile = open(argv[4], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (*outfile < 0)
+	{
+		close(*infile);
+		ft_error_file(argv[4]);
+	}
 }
+
+int	main(int argc, char *argv[], char *envp[])
+{
+	int	infile, outfile, pipefd[2];
+	pid_t	pid;
+
+	ft_error_argc(argc);
+	init_fds(argv, &infile, &outfile);
+	if (pipe(pipefd) < 0)
+		ft_error("Pipe creation failed");
+	pid = fork();
+	if (pid < 0)
+		ft_error("Fork failed");
+	if (pid == 0)
+		process_child(argv, envp, pipefd, infile);
+	wait(NULL);
+	process_parent(argv, envp, pipefd, outfile);
+	return (0);
+}
+

@@ -27,6 +27,7 @@ INCDIR = include
 
 # Fuentesc y objetos
 SRC = $(wildcard $(SRCDIR)/*.c)
+SRCS = pipex.c utils.c path.c get_next_line.c
 SRC_BONUS = $(wildcard $(SRCDIR)/*_bonus.c)
 OBJ = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRC))
 OBJ_BONUS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRC_BONUS))

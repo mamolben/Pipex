@@ -1,93 +1,71 @@
-#include "pipex.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bonus_main.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/18 20:28:34 by marimoli          #+#    #+#             */
+/*   Updated: 2025/10/20 20:44:01 by marimoli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-// Valida argumentos de entrada
-static void check_args(int argc)
+#include "pipex_bonus.h"
+
+void	check_args(int argc)
 {
-    if (argc < 5)
-    {
-        write(2, "Usage: ./pipex_bonus infile cmd1 ... cmdN outfile\n", 51);
-        exit(EXIT_FAILURE);
-    }
+	if (argc < 5)
+	{
+		write(2, "Usage: ./pipex_bonus [here_doc LIMITER] cmd1 ... cmdN outfile\n", 63);
+		exit(EXIT_FAILURE);
+	}
 }
 
-// Inicializa y crea los pipes necesarios
-static int **init_pipes(int cmd_count)
+int	main(int argc, char **argv, char **envp)
 {
-    int **pipes;
-    int i;
+	int		i;
+	int		filein;
+	int		fileout;
+	int		**pipes;
+	int		cmd_count;
+	int		is_heredoc;
 
-    pipes = malloc(sizeof(int *) * (cmd_count - 1));
-    if (!pipes)
-        ft_error("malloc failed");
+	check_args(argc);
+	is_heredoc = 0;
+	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
+		is_heredoc = 1;
 
-    i = 0;
-    while (i < cmd_count - 1)
-    {
-        pipes[i] = malloc(sizeof(int) * 2);
-        if (!pipes[i])
-            ft_error("malloc failed");
-        if (pipe(pipes[i]) == -1)
-            ft_error("Pipe creation failed");
-        i++;
-    }
-    return pipes;
+	if (is_heredoc)
+	{
+		filein = create_heredoc_file(argv[2]);
+		fileout = open_file_out(argv[argc - 1], 1, argc);
+		cmd_count = argc - 4;
+		i = 0;
+	}
+	else
+	{
+		filein = open_file_in(argv[1], argc);
+		fileout = open_file_out(argv[argc - 1], 0, argc);
+		cmd_count = argc - 3;
+		i = 0;
+	}
+
+	pipes = init_pipes(cmd_count);
+
+	while (i < cmd_count)
+	{
+		if (i == 0)
+			child_process_first(argv, envp, pipes[i], filein, is_heredoc);
+		else if (i == cmd_count - 1)
+			child_process_last(argv, envp, pipes[i - 1], fileout, i, is_heredoc);
+		else
+			child_process_middle(argv, envp, pipes[i - 1], pipes[i], i, is_heredoc);
+		i++;
+	}
+
+	free_pipes(pipes, cmd_count);
+	wait_for_all(cmd_count);
+	return (0);
 }
 
-// Libera y cierra todos los pipes creados
-static void free_pipes(int **pipes, int cmd_count)
-{
-        int i;
-    i = 0;
-    while (i < cmd_count - 1)
-    {
-        close(pipes[i][0]);
-        close(pipes[i][1]);
-        free(pipes[i]);
-        i++;
-    }
-    free(pipes);
-}
 
-// Crea procesos hijos y ejecuta los comandos
-static void spawn_children(int cmd_count, char *argv[], char *envp[], int **pipes, int infile, int outfile)
-{
-    int i;
-    i = 0;
-    while (i < cmd_count - 1)
-    {
-        pid_t pid = fork();
-        if (pid < 0)
-            ft_error("Fork failed");
-        if (pid == 0) // Hijo
-        {
-            if (i == 0)
-                execute_first_child(argv[2], envp, pipes[0], infile);
-            else if (i == cmd_count - 1)
-                execute_last_child(argv[argc - 2], envp, pipes[i - 1], outfile);
-            else
-                execute_middle_child(argv[i + 2], envp, pipes[i - 1], pipes[i]);
-        }
-        i++;
-    }
-}
-
-int main(int argc, char *argv[], char *envp[])
-{
-    int cmd_count;
-    int infile;
-    int outfile;
-    int **pipes;
-
-    check_args(argc);
-
-    cmd_count = argc - 3;
-    infile = open_file_in(argv[1], argc);
-    outfile = open_file_out(argv[argc - 1], argc);
-    pipes = init_pipes(cmd_count);
-    spawn_children(cmd_count, argv, envp, pipes, infile, outfile);
-    free_pipes(pipes, cmd_count);
-    close(infile);
-    close(outfile);
-    wait_for_all(cmd_count);
-    return (0);
-}
