@@ -1,42 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   libft_mem_dup.c                                    :+:      :+:    :+:   */
+/*   libft_fd.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/18 20:01:25 by marimoli          #+#    #+#             */
-/*   Updated: 2025/11/09 18:15:02 by marimoli         ###   ########.fr       */
+/*   Created: 2025/10/18 20:28:34 by marimoli          #+#    #+#             */
+/*   Updated: 2025/11/09 18:34:03 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	ft_free(char **str)
+void	ft_putchar_fd(char c, int fd)
 {
-	int	pos;
-
-	pos = 0;
-	if (!str)
-		return ;
-	while (str[pos])
-	{
-		free(str[pos]);
-		pos++;
-	}
-	free(str);
+	write (fd, &c, 1);
 }
 
-int	ft_strncmp(const char *str1, const char *str2, size_t n)
+void	ft_putstr_fd(char *str, int fd)
 {
-	size_t	pos;
-
-	pos = 0;
-	while (pos < n && (str1[pos] || str2[pos]))
+	if (str && fd >= 0)
 	{
-		if (str1[pos] != str2[pos])
-			return ((unsigned char)str1[pos] - (unsigned char)str2[pos]);
-		pos++;
+		while (*str)
+		{
+			ft_putchar_fd(*str, fd);
+			str++;
+		}
 	}
-	return (0);
+}
+
+void	ft_putendl_fd(char *s, int fd)
+{
+	ft_putstr_fd(s, fd);
+	ft_putchar_fd('\n', fd);
 }

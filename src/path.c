@@ -6,12 +6,13 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 19:47:25 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/19 18:41:24 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/09 19:48:39 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
+/* ====== Une la ruta de archivo y comando ====== */
 char	*join_path(char *dir, char *cmd)
 {
 	char	*tmp;
@@ -25,12 +26,13 @@ char	*join_path(char *dir, char *cmd)
 	return (result);
 }
 
+/* ====== Busca un camino ======*/
 char	*find_path_env(char *envp[])
 {
 	int	i;
 
 	i = 0;
-	while (envp[i] && ft_strncmp(envp[i], "PATH=", 5))
+	while (envp[i] && ft_strncmp(envp[i], "PATH=", 5) != 0)
 		i++;
 	if (envp[i])
 		return (envp[i] + 5);
@@ -38,6 +40,7 @@ char	*find_path_env(char *envp[])
 		return (NULL);
 }
 
+/* ====== Busca ejecutable en las rutas ====== */
 static char	*find_executable(char **paths, char *cmd)
 {
 	char	*candidate;
@@ -55,6 +58,7 @@ static char	*find_executable(char **paths, char *cmd)
 	return (NULL);
 }
 
+/* ====== Obtener la ruta del comando ====== */
 char	*get_cmd_path(char *cmd, char *envp[])
 {
 	char	*path_str;
@@ -62,9 +66,10 @@ char	*get_cmd_path(char *cmd, char *envp[])
 	char	*result;
 
 	path_str = find_path_env(envp);
+	if (!path_str)
+		return (NULL);
 	paths = ft_split(path_str, ':');
-	result = NULL;
-	if (!cmd || !paths)
+	if (!paths)
 		return (NULL);
 	result = find_executable(paths, cmd);
 	ft_free(paths);

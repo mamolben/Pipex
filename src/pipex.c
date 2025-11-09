@@ -6,12 +6,12 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 16:01:28 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/19 18:28:43 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/09 19:28:06 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
+/* ====== proceso hijo ======= */
 void	process_child(char *argv[], char *envp[], int pipefd[], int infile)
 {
 	char	**cmd_args;
@@ -33,6 +33,7 @@ void	process_child(char *argv[], char *envp[], int pipefd[], int infile)
 	ft_error("execve failed");
 }
 
+/* ====== proceso padre ======= */
 void	process_parent(char *argv[], char *envp[], int pipefd[], int outfile)
 {
 	char	**cmd_args;
@@ -54,31 +55,66 @@ void	process_parent(char *argv[], char *envp[], int pipefd[], int outfile)
 	ft_error("execve failed");
 }
 
-int	main(int argc, char *argv[], char *envp[])
+/* ====== inicializa los descriptores de archivo ======= */
+void	init_fds(char *argv[], int *infile, int *outfile)
 {
-	int		infile;
-	int		outfile;
-	int		pipefd[2];
-	pid_t	pid;
-
-	ft_error_argc(argc);
-	infile = open(argv[1], O_RDONLY);
-	if (infile < 0)
+	*infile = open(argv[1], O_RDONLY);
+	if (*infile < 0)
 		ft_error_file(argv[1]);
-	outfile = open(argv[4], O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	if (outfile < 0)
+	*outfile = open(argv[4], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (*outfile < 0)
 	{
-		close(infile);
+		close(*infile);
 		ft_error_file(argv[4]);
 	}
+}
+
+/* ====== Ejecución de la lógica de pipex. ====== */
+void	execute(char *argv[], char *envp[], int infile, int outfile)
+{
+	int		pipefd[2];
+	pid_t	pid1;
+	pid_t	pid2;
+
 	if (pipe(pipefd) < 0)
 		ft_error("Pipe creation failed");
-	pid = fork();
-	if (pid < 0)
+	pid1 = fork();
+	if (pid1 < 0)
 		ft_error("Fork failed");
-	if (pid == 0)
+	if (pid1 == 0)
 		process_child(argv, envp, pipefd, infile);
-	wait(NULL);
-	process_parent(argv, envp, pipefd, outfile);
+	pid2 = fork();
+	if (pid2 < 0)
+		ft_error("Fork failed");
+	if (pid2 == 0)
+		process_parent(argv, envp, pipefd, outfile);
+	//printf ("despues de comprobar error tubo, en execute \n");
+	close(pipefd[0]);
+	//printf ("despues de cerrar primer hijo \n");
+	close(pipefd[1]);
+	//printf ("despues de cerrar segundo hijo \n");
+	close(infile);
+	//printf ("despues de cerrar archivo de entrada \n");
+	close(outfile);
+	//printf ("despues de cerrar archivo de salida \n");
+	waitpid(pid1, NULL, 0);
+	//printf ("despues de esperar  cerrar pid1 \n");
+	waitpid(pid2, NULL, 0);
+	//printf ("despues de esperar  cerrar pid2 \n");
+}
+
+/* ====== Ejecución de dos comandos. ====== */
+int	main(int argc, char *argv[], char *envp[])
+{
+	int	infile;
+	int	outfile;
+
+	ft_error_argc(argc);
+	//printf ("despues de error argumento \n");
+	init_fds(argv, &infile, &outfile);
+	//printf ("despues de iniciar descriptores \n");
+	execute(argv, envp, infile, outfile);
+	//printf ("despues de la ejecucion \n");
 	return (0);
 }
+

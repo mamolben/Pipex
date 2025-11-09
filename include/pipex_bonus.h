@@ -6,60 +6,32 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 20:41:25 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/19 18:08:17 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/09 20:32:52 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPEX_BONUS_H
 # define PIPEX_BONUS_H
 
-# include <unistd.h>
-# include <stdlib.h>
-# include <fcntl.h>
-# include <sys/wait.h>
-# include <stdio.h>
+# include "pipex.h"
 
-typedef struct s_pipex
-{
-	int		argc;
-	char	**argv;
-	char	**envp;
-	int		infile;
-	int		outfile;
-	int		cmd_count;
-	int		**pipes;
-	int		is_heredoc;
-}	t_pipex;
+/* ======= Funciones de get_bonus.c ======= */
+int		get_next_line(char **line);
+int		get_cmd_count(int argc, int heredoc);
 
-/* files */
-int		open_file_in(char *filename);
-int		open_file_out(char *filename);
-int		open_file_out_append(char *filename);
-int		create_heredoc_file(char *limiter);
+/* ======= Funciones de fd_hd_bonus.c ======= */
+int		open_heredoc_fd(char *limiter);
+int		open_input_fd(char **argv, int heredoc);
+int		open_output_fd(char *outfile, int heredoc);
 
-/* children */
-void	execute_first_child(t_pipex *px, int i);
-void	execute_middle_child(t_pipex *px, int i);
-void	execute_last_child(t_pipex *px, int i);
-void	wait_for_all(int child_count);
+/* ======= Funciones de pipex_bonus.c ======= */
+void	command(char *cmd, char **envp, int fd_in, int fd_out);
+void	exec(char *cmd, char **env);
+void	do_pipe(char *cmd, char **env);
+void	here_doc(char **av);
 
-#endif
-
-/* ************************************************************************** */
-
-
-#ifndef PIPEX_BONUS_H
-# define PIPEX_BONUS_H
-
-/*files*/
-int		open_file_in(char *filename, int argc);
-int		open_file_out(char *filename, int argc);
-
-/*children*/
-void	execute_first_child(char *cmd, char *envp[], int pipefd[2], int infile);
-void	execute_middle_child(char *cmd, char *envp[], int pipefd_prev[2],
-			int pipefd_next[2]);
-void	execute_last_child(char *cmd, char *envp[], int pipefd[2], int outfile);
-void	wait_for_all(int child_count);
+/* ======= Helpers ======= */
+char	*get_cmd_path(char *cmd, char **env);  // reemplaza get_path
+void	ft_free(char **tab);                     // reemplaza ft_free_tab
 
 #endif

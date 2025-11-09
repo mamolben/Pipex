@@ -11,48 +11,67 @@
 #                                                                              #
 # **************************************************************************** #
 
-# Ejecutables
+# Nombre del ejecutable
 NAME = pipex
 NAME_BONUS = pipex_bonus
 
 # Compilador y flags
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -I$(INCDIR)
-RM = rm -fCC = gcc
+CC = cc
+CFLAGS = -Wall -Wextra -Werror -I./include -g
+RM = rm -f
 
 # Directorios
-SRCDIR = src
-OBJDIR = $(SRCDIR)/.o
-INCDIR = include
+SRC_DIR = src
+SRC_BONUS_DIR = src_bonus
+OBJ_DIR = $(SRC_DIR)/.o
+OBJ_BONUS_DIR = $(SRC_BONUS_DIR)/.o
+INC_DIR = include
 
-# Fuentesc y objetos
-SRC = $(wildcard $(SRCDIR)/*.c)
-SRC_BONUS = $(wildcard $(SRCDIR)/*_bonus.c)
-OBJ = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRC))
-OBJ_BONUS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRC_BONUS))
+# Fuentes y objetos
+SRC = $(wildcard $(SRC_DIR)/*.c)
+SRC_BONUS = $(wildcard $(SRC_BONUS_DIR)/*.c)
 
-# Regla de compilación
+OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC))
+BONUS_OBJS = $(patsubst $(SRC_BONUS_DIR)/%.c,$(OBJ_BONUS_DIR)/%.o,$(SRC_BONUS))
+
+
+# Reglas de compilación
 all: $(NAME)
 
-# Compilación de ejecutables y objetos
-$(NAME): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^
-bonus: $(NAME_BONUS)
-$(NAME_BONUS): $(OBJ_BONUS)
-	$(CC) $(CFLAGS) -o $@ $^
-$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-	
-# Creación del directorio objeto
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
+# pipex
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) -I$(INC_DIR) -o $@ $^
 
-# Limpieza de archivos objeto y ejecutables
+# con _bonus
+$(NAME_BONUS): $(BONUS_OBJS)
+	$(CC) $(CFLAGS) -I$(INC_DIR) -o $@ $^
+
+# archivos .c a .o
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_BONUS_DIR)/%.o: $(SRC_BONUS_DIR)/%.c | $(OBJ_BONUS_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Creación del directorio de objetos
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(OBJ_BONUS_DIR):
+	mkdir -p $(OBJ_BONUS_DIR)
+
+# Limpieza 
 clean:
-	$(RM) $(NAME)
-# Limpieza completa
+	@rm -rf $(OBJ_DIR) $(OBJ_BONUS_DIR)
+
 fclean: clean
-	$(RM) $(NAME)
+	@rm -rf $(NAME) $(NAME_BONUS)
+
+# Recompilación
 re: fclean all
+
+# Regla para la compilación bonus
+bonus: $(NAME_BONUS)
+
 # Prevención de conflictos con archivos y directorios
 .PHONY: all clean fclean re bonus

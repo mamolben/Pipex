@@ -6,14 +6,14 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 16:02:34 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/19 12:57:34 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/09 17:27:32 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPEX_H
 # define PIPEX_H
 
-/*Library standard*/
+/* ======= Standard C Library ======= */
 # include <unistd.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -21,8 +21,7 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 
-/*Library personal*/
-
+/* ======= Funciones Libft ======= */
 /* libft_string.c */
 size_t	ft_strlen(const char *str);
 char	*ft_strdup(const char *str);
@@ -30,30 +29,37 @@ char	*ft_substr(char const *s, unsigned int start, size_t len);
 size_t	ft_strlcpy(char *dest, const char *src, size_t size);
 char	*ft_strjoin(char const *s1, char const *s2);
 
-/* libft_split.c */
+/* ======= libft_mem_dup.c ======= */
+void	ft_free(char **str);
+int		ft_strncmp(const char *s1, const char *s2, size_t n);
+
+/* ======= libft_split.c ======= */
 size_t	count_substr(const char *s, char c);
 void	free_split(char **array, size_t idx);
 char	*copy_substr(const char *start, char c);
 int		fill_array(char **array, const char *s, char c, size_t count);
 char	**ft_split(const char *str, char car);
 
-/*libft_mem_dup.c*/
-void	ft_free(char **str);
-int		ft_strncmp(const char *str1, const char *str2, size_t n);
+/* ======= libft_fd.c ======= */
+void	ft_putchar_fd(char c, int fd);
+void	ft_putstr_fd(char *str, int fd);
+void	ft_putendl_fd(char *s, int fd);
 
-/* error.c */
+/* ======= Funciones de error.c  ======= */
 void	ft_error(const char *msg);
 void	ft_error_cmd(const char *cmd);
 void	ft_error_file(const char *file);
 void	ft_error_argc(int argc);
 
-/* path */
+/* ======= Funciones de path.c ======= */
 char	*join_path(char *dir, char *cmd);
 char	*find_path_env(char *envp[]);
 char	*get_cmd_path(char *cmd, char *envp[]);
 
-/* pipex functions */
+/* ======= Funciones de pipex.c  ======= */
 void	process_child(char *argv[], char *envp[], int pipefd[], int infile);
 void	process_parent(char *argv[], char *envp[], int pipefd[], int outfile);
+void	init_fds(char *argv[], int *infile, int *outfile);
+void	execute(char *argv[], char *envp[], int infile, int outfile);
 
 #endif

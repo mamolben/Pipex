@@ -6,26 +6,26 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 19:53:26 by marimoli          #+#    #+#             */
-/*   Updated: 2025/10/19 12:44:53 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/09 18:26:30 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-size_t	count_substr(const char *s, char c)
+size_t	count_substr(const char *str, char c)
 {
 	size_t	count;
 
 	count = 0;
-	while (*s)
+	while (*str)
 	{
-		while (*s == c)
-			s++;
-		if (*s)
+		while (*str == c)
+			str++;
+		if (*str)
 		{
 			count++;
-			while (*s && *s != c)
-				s++;
+			while (*str && *str != c)
+				str++;
 		}
 	}
 	return (count);
@@ -74,18 +74,18 @@ int	fill_array(char **array, const char *s, char c, size_t count)
 	return (1);
 }
 
-char	**ft_split(char const *s, char c)
+char	**ft_split(char const *str, char c)
 {
 	char	**array;
 	size_t	count;
 
-	if (!s)
+	if (!str)
 		return (NULL);
-	count = count_substr(s, c);
+	count = count_substr(str, c);
 	array = (char **)malloc(sizeof(char *) * (count + 1));
 	if (!array)
 		return (NULL);
-	if (!fill_array(array, s, c, count))
+	if (!fill_array(array, str, c, count))
 	{
 		free(array);
 		return (NULL);
