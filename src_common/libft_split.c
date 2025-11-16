@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 19:53:26 by marimoli          #+#    #+#             */
-/*   Updated: 2025/11/09 18:26:30 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/15 18:23:58 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,15 @@ void	free_split(char **array, size_t idx)
 char	*copy_substr(const char *start, char c)
 {
 	size_t	len;
+	char	*substr;
 
 	len = 0;
 	while (start[len] && start[len] != c)
 		len++;
-	return (ft_substr(start, 0, len));
+	substr = (ft_substr(start, 0, len));
+	if (!substr)
+		return (NULL);
+	return (substr);
 }
 
 int	fill_array(char **array, const char *s, char c, size_t count)
@@ -83,6 +87,7 @@ char	**ft_split(char const *str, char c)
 		return (NULL);
 	count = count_substr(str, c);
 	array = (char **)malloc(sizeof(char *) * (count + 1));
+
 	if (!array)
 		return (NULL);
 	if (!fill_array(array, str, c, count))

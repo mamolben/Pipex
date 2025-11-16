@@ -24,11 +24,12 @@ int	get_next_line(char **line)
 	buffer[i] = '\n';
 	buffer[++i] = '\0';
 	*line = buffer;
-	free(buffer);
+	//free(buffer);
 	return (r);
+	
 }
 
-/** * @brief Devuelve el número de comandos totales. */
+/* ====== Devuelve el número de comandos totales. ====== */
 int	get_cmd_count(int argc, int heredoc)
 {
 	return (argc - 3 - heredoc); 

@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 19:47:25 by marimoli          #+#    #+#             */
-/*   Updated: 2025/11/09 19:48:39 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/15 18:26:15 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ static char	*find_executable(char **paths, char *cmd)
 }
 
 /* ====== Obtener la ruta del comando ====== */
-char	*get_cmd_path(char *cmd, char *envp[])
+char	*get_path(char *cmd, char **envp)
 {
 	char	*path_str;
 	char	**paths;
