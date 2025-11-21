@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 16:01:28 by marimoli          #+#    #+#             */
-/*   Updated: 2025/11/16 16:30:04 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/21 20:19:27 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ void	process_child(char *argv[], char *envp[], int pipefd[], int infile)
 		ft_error_cmd(cmd_args[0]);
 		exit(EXIT_FAILURE);
 	}
-	if (execve(cmd_path, cmd_args, envp) == -1) 
+	if (execve(cmd_path, cmd_args, envp) == -1)
 	{
- 		perror("execve failed (child)");
+		perror("execve failed (child)");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -63,7 +63,7 @@ void	process_parent(char *argv[], char *envp[], int pipefd[], int outfile)
 		ft_error_cmd(cmd_args[0]);
 	if (execve(cmd_path, cmd_args, envp) == -1)
 	{
- 		perror("execve failed");
+		perror("execve failed");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -82,7 +82,7 @@ void	init_fds(char *argv[], int *infile, int *outfile)
 	}
 }
 
-/* ====== Ejecución de la lógica de pipex. ====== */
+/* ====== Ejecución de la lógica de pipex ====== */
 void	execute(char *argv[], char *envp[], int infile, int outfile)
 {
 	int		pipefd[2];
@@ -91,11 +91,11 @@ void	execute(char *argv[], char *envp[], int infile, int outfile)
 
 	if (pipe(pipefd) < 0)
 		ft_error("Pipe creation failed");
-	pid1 = fork(); 
+	pid1 = fork();
 	if (pid1 < 0)
 		ft_error("Fork failed");
-	if (pid1 == 0) 
-		process_child(argv, envp, pipefd, infile); 
+	if (pid1 == 0)
+		process_child(argv, envp, pipefd, infile);
 	pid2 = fork();
 	if (pid2 < 0)
 		ft_error("Fork failed");
@@ -104,20 +104,19 @@ void	execute(char *argv[], char *envp[], int infile, int outfile)
 	close(pipefd[0]);
 	close(pipefd[1]);
 	close(infile);
-	close(outfile);	
-	waitpid(pid1, NULL, 0);	
-	waitpid(pid2, NULL, 0);	
+	close(outfile);
+	waitpid(pid1, NULL, 0);
+	waitpid(pid2, NULL, 0);
 }
 
-/* ====== Ejecución de dos comandos. ====== */
+/* ====== Ejecución de dos comandos ====== */
 int	main(int argc, char *argv[], char *envp[])
 {
 	int	infile;
 	int	outfile;
 
-	ft_error_argc(argc);	
-	init_fds(argv, &infile, &outfile);	
-	execute(argv, envp, infile, outfile);	
+	ft_error_argc(argc);
+	init_fds(argv, &infile, &outfile);
+	execute(argv, envp, infile, outfile);
 	return (0);
 }
-

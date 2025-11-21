@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 20:01:25 by marimoli          #+#    #+#             */
-/*   Updated: 2025/11/10 21:55:08 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/21 20:18:41 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	ft_free(char **str)
 	free(str);
 }
 
- /* ====== Compara los n caracteres de dos cadenas ======*/
+/* ====== Compara los n caracteres de dos cadenas ======*/
 int	ft_strncmp(const char *str1, const char *str2, size_t n)
 {
 	size_t	pos;
