@@ -6,13 +6,13 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 16:01:28 by marimoli          #+#    #+#             */
-/*   Updated: 2025/11/23 13:25:45 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/23 18:29:57 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-/* ======Ejecuta el primer comando: cmd1 < infile ======*/
+/* ====== Ejecuta el primer comando: cmd1 < infile ====== */
 void	process_child(char *argv[], char *envp[], int pipefd[], int infile)
 {
 	char	**cmd_args;
@@ -30,12 +30,14 @@ void	process_child(char *argv[], char *envp[], int pipefd[], int infile)
 	cmd_path = get_path(cmd_args[0], envp);
 	if (!cmd_path)
 		ft_error_cmd(cmd_args[0]);
-	execve(cmd_path, cmd_args, envp);
-	perror("execve failed (child)");
-	exit(EXIT_FAILURE);
+	if (execve(cmd_path, cmd_args, envp) == -1)
+	{
+		perror("execve failed (child)");
+		exit(EXIT_FAILURE);
+	}
 }
 
-/* =======Ejecuta el segundo comando: pipe -> cmd2 > outfile ======*/
+/* ====== Ejecuta el segundo comando: pipe -> cmd2 > outfile ====== */
 void	process_parent(char *argv[], char *envp[], int pipefd[], int outfile)
 {
 	char **cmd_args;
@@ -53,12 +55,14 @@ void	process_parent(char *argv[], char *envp[], int pipefd[], int outfile)
 	cmd_path = get_path(cmd_args[0], envp);
 	if (!cmd_path)
 		ft_error_cmd(cmd_args[0]);
-	execve(cmd_path, cmd_args, envp);
-	perror("execve failed (parent)");
-	exit(EXIT_FAILURE);
+	if (execve(cmd_path, cmd_args, envp) == -1)
+	{
+		perror("execve failed (parent)");
+		exit(EXIT_FAILURE);
+	}
 }
 
-/* ====== Inicializa archivos ======= */
+/* ====== Inicializa archivos ====== */
 void	init_fds(char *argv[], int *infile, int *outfile)
 {
 	*infile = open(argv[1], O_RDONLY);
@@ -75,7 +79,7 @@ void	init_fds(char *argv[], int *infile, int *outfile)
 /* ====== Ejecución del pipe ====== */
 void	execute(char *argv[], char *envp[], int infile, int outfile)
 {
-	int	pipefd[2];
+	int		pipefd[2];
 	pid_t	pid1;
 	pid_t	pid2;
 
@@ -85,7 +89,7 @@ void	execute(char *argv[], char *envp[], int infile, int outfile)
 	if (pid1 < 0)
 		ft_error("fork failed (pid1)");
 	if (pid1 == 0)
-	process_child(argv, envp, pipefd, infile);
+		process_child(argv, envp, pipefd, infile);
 	pid2 = fork();
 	if (pid2 < 0)
 		ft_error("fork failed (pid2)");
@@ -100,6 +104,7 @@ void	execute(char *argv[], char *envp[], int infile, int outfile)
 }
 
 /* ====== main ====== */
+
 int	main(int argc, char *argv[], char *envp[])
 {
 	int	infile;

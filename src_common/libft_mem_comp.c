@@ -6,7 +6,11 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 20:01:25 by marimoli          #+#    #+#             */
+<<<<<<< HEAD:src_common/libft_mem_comp.c
 /*   Updated: 2025/11/21 22:19:38 by marimoli         ###   ########.fr       */
+=======
+/*   Updated: 2025/11/21 20:18:41 by marimoli         ###   ########.fr       */
+>>>>>>> c4bd971925e4f469e28f449cb074a87f87519b41:src_common/libft_mem_dup.c
 /*                                                                            */
 /* ************************************************************************** */
 
