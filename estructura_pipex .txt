@@ -1,0 +1,177 @@
+pipex_bonus/
+│
+├── includes/
+│   ├── pipex.h          // Header base: functions standar y common, core pipex 
+│   └── pipex_bonus.h    // Header bonus: here_doc, do_pipe, setup, exec_cmd
+│
+├── src/				 // Core pipex
+│   └── pipex.c          // process_child, process_parent, init_fds, execute, main (mandatory)
+│
+├── src_common/          // Código común a mandatory y bonus
+│   ├── libft_string.c   // ft_strlen, *ft_strdup, *ft_substr, ft_strlcpy, *ft_strjoin
+│   ├── libft_split.c    // count_substr, free_split, *copy_substr, fill_array, ft_split
+│   ├── libft_mem_comp.c // ft_free, ft_strncmp
+│   ├── libft_fd.c		 // ft_putchar_fd, ft_putstr_fd, ft_putendl_fd
+│   ├── path.c           // get_path, join_path, find_path_env
+│   └── error.c          // ft_error, ft_error_cmd, ft_error_file, ft_error_argc
+│
+├── src_bonus/           // Solo para el bonus
+│   ├── pipex_bonus.c      // setup_fds, exec_cmd, main_bonus 
+│   └── pipe_process_bonus.c // child_process, parent_process, do_pipe, open_heredoc_fd, get_next_line
+
+1. includes/
+
+pipex.h → header base con:
+	Libft (cadenas, split, memoria, fd)
+	Manejo de errores (ft_error, ft_error_cmd, etc.)
+	Funciones de path (get_path, join_path, find_path_env)
+	Funciones core de pipex normal (process_child, process_parent, init_fds, execute)
+
+pipex_bonus.h → header bonus con:
+	Pipes y here_doc: do_pipe, child_process, parent_process, open_heredoc_fd, get_next_line
+	Setup y ejecución bonus: setup_fds, exec_cmd
+
+2 src/
+	pipex.c → mandatory
+		process_child, process_parent, init_fds, execute, main
+
+3. src_common/ (compartido entre mandatory y bonus)
+
+	libft_string.c, libft_split.c, libft_mem_dup.c, libft_fd.c
+	Funciones auxiliares de cadenas, split, memoria, fd
+
+	path.c → manejo de PATH (get_path, join_path, find_path_env)
+
+	error.c → manejo de errores (ft_error, ft_error_cmd, ft_error_file, ft_error_argc)
+
+🔹 Flujo de ejecución
+Mandatory (pipex normal)
+
+main() en pipex.c
+
+Llama init_fds() → abre infile/outfile
+
+Crea pipe y forks con process_child() y process_parent()
+
+Ejecuta los dos comandos
+
+Cierra fds y espera hijos
+
+[infile / outfile] ---> init_fds() ---> STDIN (infile)
+                              |
+                              v
+                         process_child(cmd1 < infile)
+                              |
+                              v
+                pipe -> process_parent(cmd2 > outfile)
+                              |
+                              v
+                         execute() ---> STDOUT (outfile)
+
+
+4. src_bonus/
+	
+pipe_process_bonus.c
+
+	do_pipe() → crea pipe, fork, redirige stdin/stdout
+
+	child_process() → hijo de do_pipe
+
+	parent_process() → padre de do_pipe
+
+	open_heredoc_fd() → lee stdin hasta limiter y devuelve fd de lectura
+
+	get_next_line() → lectura de línea para here_doc
+
+pipex_bonus.c
+
+	main() en pipex_bonus.c
+	
+	Llama setup_fds() → abre stdin es infile o heredoc, stdout es outfile
+	
+	exec_cmd() → ejecuta el último comando
+
+	main() → recorre todos los comandos intermedio → do_pipe() (fork+pipe) y ejecuta el último
+	
+	Último comando → exec_cmd()
+
+	Cada do_pipe():
+		Hijo escribe en stdout (pipe write)
+		Hijo → dup2 a pipe write → exec_cmd
+
+		Padre lee desde pipe (pipe read) para el siguiente comando
+		Padre → dup2 a pipe read → next command
+
+		here_doc solo afecta stdin del primer comando.
+    
+
+Flujo de datos en bonus
+[infile / heredoc] ---> setup_fds() ---> STDIN
+                              |
+                              v
+                         do_pipe(cmd1)
+                              |
+                              v
+                         do_pipe(cmd2)
+                              |
+                             ...
+                              |
+                              v
+                         exec_cmd(último cmd) ---> STDOUT (outfile)
+
+Ventajas de esta estructura
+
+
+
+           ┌───────────────┐
+           │  Usuario/     │
+           │  Here_doc     │
+           └───────┬───────┘
+                   │ stdin
+                   ▼
+           ┌───────────────┐
+           │ open_heredoc_fd│
+           │  (pipe read)   │
+           └───────┬───────┘
+                   │ stdin
+                   ▼
+           ┌───────────────┐
+           │   setup_fds() │
+           │   dup2(stdin) │
+           └───────┬───────┘
+                   │
+                   ▼
+       ┌─────────────────────┐
+       │ do_pipe(cmd1)       │
+       │ ┌───────────────┐   │
+       │ │ child_process │──▶│ stdout → pipe write
+       │ └───────────────┘   │
+       │ ┌───────────────┐   │
+       │ │ parent_process│◀──│ stdin ← pipe read
+       │ └───────────────┘   │
+       └─────────┬───────────┘
+                 │ stdin
+                 ▼
+       ┌─────────────────────┐
+       │ do_pipe(cmd2)       │
+       │ ... mismo flujo ... │
+       └─────────┬───────────┘
+                 │ stdin
+                 ▼
+       ┌─────────────────────┐
+       │ exec_cmd(último cmd)│
+       │ stdout → outfile    │
+       └─────────────────────┘
+Leyenda
+
+Flechas hacia abajo → flujo de datos (stdin/stdout)
+
+do_pipe → crea un pipe y hace fork:
+
+Hijo escribe en stdout (pipe write)
+
+Padre redirige stdin al read end del pipe
+
+open_heredoc_fd → genera el primer fd de stdin si usamos here_doc
+
+exec_cmd último comando → escribe directamente al outfile

@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 20:28:34 by marimoli          #+#    #+#             */
-/*   Updated: 2025/11/23 16:16:59 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/23 19:51:18 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,19 +63,15 @@ void	exec_cmd(char *cmd, char **envp)
 }
 
 /* ====== main ====== */
-
 int	main(int ac, char **av, char **envp)
 {
 	int	i;
 	int	fd_out;
 
 	setup_fds(ac, av, &i, &fd_out);
-
 	while (i < ac - 2)
 		do_pipe(av[i++], envp);
-
 	dup2(fd_out, STDOUT_FILENO);
 	close(fd_out);
-
 	exec_cmd(av[ac - 2], envp);
 }

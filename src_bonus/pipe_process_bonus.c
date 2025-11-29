@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 20:54:59 by marimoli          #+#    #+#             */
-/*   Updated: 2025/11/23 17:58:45 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/23 19:53:33 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int	open_heredoc_fd(char *limiter)
 	while (1)
 	{
 		ft_putstr_fd("heredoc> ", 1);
-		if (get_next_line(&line) <= 0 
+		if (get_next_line(&line) <= 0
 			|| !ft_strncmp(line, limiter, ft_strlen(limiter)))
 			break ;
 		ft_putendl_fd(line, pipefd[1]);
