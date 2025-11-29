@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 20:28:34 by marimoli          #+#    #+#             */
-/*   Updated: 2025/11/23 19:51:18 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/29 20:26:40 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void	setup_fds(int ac, char **av, int *i, int *fd_out)
 	int	heredoc;
 
 	heredoc = !ft_strncmp(av[1], "here_doc", 8);
-
 	if (ac < 5 + heredoc)
 	{
 		ft_putendl_fd("Uso incorrecto", 2);

@@ -6,7 +6,7 @@
 /*   By: marimoli <marimoli@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 19:53:26 by marimoli          #+#    #+#             */
-/*   Updated: 2025/11/21 20:18:02 by marimoli         ###   ########.fr       */
+/*   Updated: 2025/11/29 20:28:32 by marimoli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ char	**ft_split(char const *str, char c)
 		return (NULL);
 	count = count_substr(str, c);
 	array = (char **)malloc(sizeof(char *) * (count + 1));
-
 	if (!array)
 		return (NULL);
 	if (!fill_array(array, str, c, count))

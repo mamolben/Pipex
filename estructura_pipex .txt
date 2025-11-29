@@ -1,4 +1,4 @@
-pipex_bonus/
+pipex/
 │
 ├── includes/
 │   ├── pipex.h          // Header base: functions standar y common, core pipex 
